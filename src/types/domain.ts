@@ -14,7 +14,7 @@ export interface PackageDimensions {
   length: number;
   width: number;
   height: number;
-  unit: "in" | "cm";
+  unit: 'in' | 'cm';
 }
 
 /**
@@ -22,13 +22,13 @@ export interface PackageDimensions {
  */
 export interface PackageWeight {
   value: number;
-  unit: "lbs" | "kg";
+  unit: 'lbs' | 'kg';
 }
 
 /**
  * Union type for package types
  */
-export type PackageType = "envelope" | "box" | "tube" | "custom";
+export type PackageType = 'envelope' | 'box' | 'tube' | 'custom';
 
 /**
  * Represents a complete package for shipping
@@ -66,7 +66,7 @@ export interface Address {
 /**
  * Union type for shipping service speeds
  */
-export type ServiceSpeed = "overnight" | "two-day" | "standard" | "economy";
+export type ServiceSpeed = 'overnight' | 'two-day' | 'standard' | 'economy';
 
 /**
  * Represents optional shipping services and features
@@ -77,6 +77,8 @@ export interface ShippingOptions {
   insurance: boolean;
   fragileHandling: boolean;
   saturdayDelivery: boolean;
+  saturdayDeliveryRequired?: boolean;
+  declaredValue?: number;
   insuredValue?: number;
 }
 
@@ -87,16 +89,12 @@ export interface ShippingOptions {
 /**
  * Union type for supported carriers
  */
-export type CarrierName = "USPS" | "FedEx" | "UPS" | "DHL";
+export type CarrierName = 'USPS' | 'FedEx' | 'UPS' | 'DHL';
 
 /**
  * Union type for fee categories
  */
-export type FeeType =
-  | "insurance"
-  | "signature"
-  | "fragile"
-  | "saturdayDelivery";
+export type FeeType = 'insurance' | 'signature' | 'fragile' | 'saturdayDelivery' | 'fuel' | 'other';
 
 /**
  * Represents an individual fee component
@@ -112,7 +110,7 @@ export interface Fee {
  */
 export interface ShippingRate {
   id: string;
-  carrier: CarrierName;
+  carrier: CarrierName | 'FedEx' | 'USPS';
   serviceCode: string;
   serviceName: string;
   speed: ServiceSpeed;
@@ -120,7 +118,7 @@ export interface ShippingRate {
   baseRate: number;
   additionalFees: Fee[];
   totalCost: number;
-  estimatedDeliveryDate: string;
+  estimatedDeliveryDate: Date;
   guaranteedDelivery: boolean;
 }
 
@@ -201,7 +199,7 @@ export interface CarrierConfig {
 export interface AppConfig {
   carriers: Record<CarrierName, CarrierConfig>;
   appUrl: string;
-  environment: "development" | "staging" | "production";
+  environment: 'development' | 'staging' | 'production';
 }
 
 // ============================================================================
@@ -229,4 +227,14 @@ export interface RateDecorator {
 export interface CarrierAdapter {
   getCarrier(): CarrierName;
   getRates(request: RateRequest): Promise<ShippingRate[]>;
+}
+
+/**
+ * Tracking information for a shipped package
+ */
+export interface TrackingInfo {
+  trackingNumber: string;
+  status: string;
+  estimatedDeliveryDate?: Date;
+  lastUpdate: string;
 }

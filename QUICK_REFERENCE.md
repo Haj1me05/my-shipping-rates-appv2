@@ -9,13 +9,16 @@
 ## Key Files & Locations
 
 ### Type Definitions
+
 - [src/types/domain.ts](src/types/domain.ts) - All core type definitions
 
 ### Architecture Documentation
+
 - [docs/architecture.md](docs/architecture.md) - Detailed pattern documentation
 - [PHASE1_SUMMARY.md](PHASE1_SUMMARY.md) - Phase 1 completion summary
 
 ### Configuration Files
+
 - [.env.local](.env.local) - Environment variables (carrier credentials)
 - [tsconfig.json](tsconfig.json) - TypeScript strict mode configuration
 - [.prettierrc](.prettierrc) - Code formatting rules
@@ -44,13 +47,13 @@ RateResponse → { rates[], errors[], timestamp }
 
 ## Design Patterns Reference
 
-| Pattern | Location | Purpose |
-|---------|----------|---------|
-| **Strategy** | `src/services/rate-calculators/` | Different rate calc algorithms per carrier |
-| **Factory** | `src/factories/carrier-factory.ts` | Create carrier instances |
-| **Decorator** | `src/services/fee-decorators/` | Stack fees dynamically |
-| **Adapter** | `src/adapters/carrier-adapters/` | Normalize external APIs |
-| **Singleton** | `src/config/carrier-config.ts` | Single config source |
+| Pattern       | Location                           | Purpose                                    |
+| ------------- | ---------------------------------- | ------------------------------------------ |
+| **Strategy**  | `src/services/rate-calculators/`   | Different rate calc algorithms per carrier |
+| **Factory**   | `src/factories/carrier-factory.ts` | Create carrier instances                   |
+| **Decorator** | `src/services/fee-decorators/`     | Stack fees dynamically                     |
+| **Adapter**   | `src/adapters/carrier-adapters/`   | Normalize external APIs                    |
+| **Singleton** | `src/config/carrier-config.ts`     | Single config source                       |
 
 ---
 
@@ -99,12 +102,14 @@ npm test
 ## Carrier Information
 
 **Configured Carriers:**
+
 - USPS (United States Postal Service)
 - FedEx (Federal Express)
 - UPS (United Parcel Service)
 - DHL (DHL Express)
 
 **Environment Configuration:**
+
 - API Keys stored in `.env.local`
 - Sandbox mode flags available
 - Base URLs configurable per carrier
@@ -114,6 +119,7 @@ npm test
 ## Next Phase Tasks
 
 ### Phase 2: Core Service Implementation
+
 1. Implement `RateCalculationStrategy` for each carrier
 2. Create `RateDecorator` implementations for fees
 3. Develop `CarrierAdapter` for external APIs
@@ -121,6 +127,7 @@ npm test
 5. Build `CarrierConfigManager` (Singleton)
 
 ### Phase 3: UI Components
+
 1. Package input form
 2. Address input form
 3. Shipping options form
@@ -128,12 +135,14 @@ npm test
 5. Error handling component
 
 ### Phase 4: API Integration
+
 1. POST `/api/rates` endpoint
 2. Request validation
 3. Carrier orchestration
 4. Response aggregation
 
 ### Phase 5: Testing & Deployment
+
 1. Unit tests for services
 2. Integration tests for APIs
 3. E2E tests for flows
@@ -144,6 +153,7 @@ npm test
 ## TypeScript Strict Mode
 
 All the following are **ENABLED**:
+
 - ✓ `strict` - All strict flags
 - ✓ `noImplicitAny` - No implicit any types
 - ✓ `strictNullChecks` - Strict null checking
@@ -159,6 +169,7 @@ This ensures **maximum type safety** at compile time.
 ## Code Style
 
 **Prettier Configuration:**
+
 - 2-space indentation
 - 100 character line width
 - Single quotes
@@ -166,6 +177,7 @@ This ensures **maximum type safety** at compile time.
 - Semicolons enabled
 
 **ESLint:**
+
 - Next.js recommended rules
 - TypeScript support
 - React hooks rules

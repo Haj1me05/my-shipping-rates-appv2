@@ -1,0 +1,34 @@
+import type { RateRequest, RateResponse } from '@/types/domain';
+
+/**
+ * Fetch rates from the API
+ * This function is called within Suspense boundaries in React 19
+ */
+export async function fetchRates(request: RateRequest): Promise<RateResponse> {
+  try {
+    const response = await fetch('/api/rates', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.statusText}`);
+    }
+
+    const data: RateResponse = await response.json();
+    return data;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to fetch rates: ${message}`);
+  }
+}
+
+/**
+ * Create a promise that can be used with React 19's use() hook
+ */
+export function createRatesPromise(request: RateRequest): Promise<RateResponse> {
+  return fetchRates(request);
+}
