@@ -59,24 +59,6 @@ export function RatesFilters({
   return (
     <div className="bg-gray-100 rounded-lg p-4 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Carrier Filter - COMMENTED OUT to show FedEx only */}
-        {/* <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-3">Carriers</label>
-          <div className="space-y-2">
-            {uniqueCarriers.map((carrier) => (
-              <label key={carrier} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedCarriers.includes(carrier)}
-                  onChange={() => handleCarrierChange(carrier)}
-                  className="w-4 h-4 rounded"
-                />
-                <span className="text-sm text-gray-700">{carrier}</span>
-              </label>
-            ))}
-          </div>
-        </div> */}
-
         {/* Speed Filter */}
         <div>
           <label className="block text-sm font-semibold text-gray-900 mb-3">Delivery Speed</label>

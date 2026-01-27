@@ -3,6 +3,7 @@ import {
   ShippingOptions,
   CarrierError as DomainCarrierError,
   RateResponse,
+  Address,
 } from '@/types/domain';
 import { getCarrierAdapter, CarrierName } from '@/adapters/carrier-adapters';
 import { CarrierError } from '@/adapters/carrier-adapters/adapter';
@@ -10,8 +11,8 @@ import { BaseRate, applyFees } from '@/services/fee-decorators/decorator';
 import { CarrierConfigManager } from '@/config/carrier-config';
 
 interface RateServiceRequest {
-  originZipCode: string;
-  destinationZipCode: string;
+  originAddress: Address;
+  destinationAddress: Address;
   weight: number;
   dimensions?: {
     length: number;
@@ -28,10 +29,13 @@ interface RateServiceRequest {
 function validateAddressCombination(request: RateServiceRequest): string[] {
   const errors: string[] = [];
 
+  const originZipCode = request.originAddress.postalCode;
+  const destinationZipCode = request.destinationAddress.postalCode;
+
   // Check for UK postcode (only alphanumeric)
-  const isUKPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(request.destinationZipCode);
-  const isUSZip = /^\d{5}(-\d{4})?$/.test(request.destinationZipCode);
-  const isOriginUSZip = /^\d{5}(-\d{4})?$/.test(request.originZipCode);
+  const isUKPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(destinationZipCode);
+  const isUSZip = /^\d{5}(-\d{4})?$/.test(destinationZipCode);
+  const isOriginUSZip = /^\d{5}(-\d{4})?$/.test(originZipCode);
 
   // Check for mismatched origin/destination combinations
   if (isOriginUSZip && isUKPostcode) {
@@ -144,8 +148,10 @@ export class RateService {
       console.log(`[RateService] Fetching rates from ${carrier}...`);
       const adapter = getCarrierAdapter(carrier);
       const adapterRequest = {
-        originZipCode: request.originZipCode,
-        destinationZipCode: request.destinationZipCode,
+        originZipCode: request.originAddress.postalCode,
+        destinationZipCode: request.destinationAddress.postalCode,
+        originAddress: request.originAddress,
+        destinationAddress: request.destinationAddress,
         weight: request.weight,
         dimensions: request.dimensions,
         declaredValue: request.declaredValue,

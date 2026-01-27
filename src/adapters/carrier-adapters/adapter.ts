@@ -1,8 +1,10 @@
-import { ShippingRate, TrackingInfo } from '@/types/domain';
+import { ShippingRate, TrackingInfo, Address } from '@/types/domain';
 
 export interface RateRequest {
   originZipCode: string;
   destinationZipCode: string;
+  originAddress?: Address;
+  destinationAddress?: Address;
   weight: number;
   dimensions?: {
     length: number;

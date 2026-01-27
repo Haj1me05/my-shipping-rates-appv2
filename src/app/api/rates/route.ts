@@ -68,8 +68,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<RateRespo
 
     // Convert RateRequest to RateServiceRequest format
     const serviceRequest = {
-      originZipCode: body.originAddress.postalCode,
-      destinationZipCode: body.destinationAddress.postalCode,
+      originAddress: body.originAddress,
+      destinationAddress: body.destinationAddress,
       weight: body.package.weight.value,
       dimensions: {
         length: body.package.dimensions.length,

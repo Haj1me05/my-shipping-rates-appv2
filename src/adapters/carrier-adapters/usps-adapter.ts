@@ -30,31 +30,6 @@ export class USPSAdapter implements CarrierAdapter {
     // Simulate API call with mock data
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Mock response for demonstration
-    // COMMENTED OUT - USPS rates disabled to test FedEx only
-    /*
-    return {
-      RateV4Response: {
-        Package: {
-          Postage: [
-            {
-              MailService: 'PRIORITY_MAIL',
-              Rate: '28.95',
-            },
-            {
-              MailService: 'PRIORITY_MAIL_EXPRESS',
-              Rate: '45.50',
-            },
-            {
-              MailService: 'GROUND_ADVANTAGE',
-              Rate: '12.50',
-            },
-          ],
-        },
-      },
-    };
-    */
-
     // Return empty response since USPS is disabled
     return {
       RateV4Response: {

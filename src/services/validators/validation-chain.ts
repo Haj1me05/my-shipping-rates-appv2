@@ -140,6 +140,30 @@ export class RequiredAddressFieldsValidator extends BaseValidator<Address> {
 }
 
 /**
+ * Validates that origin address is in the United States (required for US-based carriers)
+ */
+export class OriginCountryValidator extends BaseValidator<Address> {
+  protected doValidation(data: Address): ValidationResult {
+    const errors: ValidationError[] = [];
+    const country = data.country.toUpperCase();
+
+    if (country !== 'US' && country !== 'USA') {
+      errors.push({
+        field: 'country',
+        message:
+          'Origin address must be in the United States. This shipping calculator supports shipments from the US to international destinations.',
+        code: 'ORIGIN_MUST_BE_US',
+      });
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
+  }
+}
+
+/**
  * Validates postal code format based on country
  */
 export class PostalCodeFormatValidator extends BaseValidator<Address> {
@@ -242,134 +266,15 @@ export class StateCodeValidator extends BaseValidator<Address> {
     'MP',
   ]);
 
-  private readonly ukCounties = new Set([
-    'AE',
-    'BD',
-    'BH',
-    'BN',
-    'BR',
-    'BS',
-    'BT',
-    'CA',
-    'CB',
-    'CF',
-    'CH',
-    'CM',
-    'CO',
-    'CR',
-    'CT',
-    'CV',
-    'CW',
-    'DA',
-    'DD',
-    'DE',
-    'DG',
-    'DH',
-    'DL',
-    'DN',
-    'DT',
-    'DY',
-    'EC',
-    'EH',
-    'EN',
-    'EX',
-    'FK',
-    'FY',
-    'GA',
-    'GL',
-    'GU',
-    'HA',
-    'HD',
-    'HG',
-    'HP',
-    'HR',
-    'HS',
-    'HU',
-    'HX',
-    'IG',
-    'IP',
-    'IV',
-    'KA',
-    'KT',
-    'KW',
-    'KY',
-    'L',
-    'LA',
-    'LD',
-    'LE',
-    'LI',
-    'LL',
-    'LN',
-    'LS',
-    'LU',
-    'M',
-    'MA',
-    'ME',
-    'MK',
-    'ML',
-    'N',
-    'NE',
-    'NG',
-    'NN',
-    'NP',
-    'NR',
-    'NW',
-    'OL',
-    'OX',
-    'PA',
-    'PE',
-    'PH',
-    'PL',
-    'PR',
-    'RG',
-    'RH',
-    'RM',
-    'S',
-    'SA',
-    'SE',
-    'SG',
-    'SK',
-    'SL',
-    'SM',
-    'SN',
-    'SO',
-    'SP',
-    'SR',
-    'SS',
-    'ST',
-    'SW',
-    'SY',
-    'TA',
-    'TD',
-    'TF',
-    'TN',
-    'TQ',
-    'TR',
-    'TS',
-    'TW',
-    'TY',
-    'UB',
-    'UP',
-    'W',
-    'WA',
-    'WC',
-    'WD',
-    'WF',
-    'WN',
-    'WR',
-    'WS',
-    'WV',
-    'YO',
-    'ZE',
-  ]);
+  private readonly ukRegions = new Set(['England', 'Scotland', 'Wales', 'Northern Ireland']);
 
   protected doValidation(data: Address): ValidationResult {
     const errors: ValidationError[] = [];
     const country = data.country.toUpperCase();
-    const state = data.state.toUpperCase().trim();
+    const state = data.state.trim();
 
     if (country === 'US' || country === 'USA') {
-      if (!this.usStates.has(state)) {
+      if (!this.usStates.has(state.toUpperCase())) {
         errors.push({
           field: 'state',
           message: 'Invalid US state code',
@@ -377,11 +282,11 @@ export class StateCodeValidator extends BaseValidator<Address> {
         });
       }
     } else if (country === 'GB') {
-      if (!this.ukCounties.has(state)) {
+      if (!this.ukRegions.has(state)) {
         errors.push({
           field: 'state',
-          message: 'Invalid UK county code',
-          code: 'INVALID_UK_COUNTY',
+          message: 'Invalid UK region. Please select England, Scotland, Wales, or Northern Ireland',
+          code: 'INVALID_UK_REGION',
         });
       }
     }

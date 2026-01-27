@@ -26,50 +26,9 @@ export class UPSAdapter implements CarrierAdapter {
     }
   }
 
-  private async callUPSAPI(request: RateRequest): Promise<UPSRateResponse> {
+  private async callUPSAPI(_request: RateRequest): Promise<UPSRateResponse> {
     // Simulate API call with mock data
     await new Promise((resolve) => setTimeout(resolve, 120));
-
-    // Mock response for demonstration
-    // COMMENTED OUT - UPS rates disabled to test FedEx only
-    /*
-    return {
-      RateModels: [
-        {
-          Shipment: {
-            Service: [
-              {
-                Code: '01',
-                Description: 'UPS Next Day Air',
-              },
-              {
-                Code: '02',
-                Description: 'UPS 2nd Day Air',
-              },
-              {
-                Code: '03',
-                Description: 'UPS Ground',
-              },
-            ],
-            ChargeWeight: {
-              Value: request.weight.toString(),
-            },
-            ShipmentRatingOptions: {
-              NegotiatedRateCharges: {
-                TotalCharge: {
-                  MonetaryValue: '55.50',
-                },
-              },
-            },
-            DeliveryTimeInformation: {
-              DeliveryTime: 'NEXT_BUSINESS_DAY',
-              DeliveryDate: '2026-01-25',
-            },
-          },
-        },
-      ],
-    };
-    */
 
     // Return empty response since UPS is disabled
     return {
