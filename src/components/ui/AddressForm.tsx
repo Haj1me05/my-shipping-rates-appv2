@@ -67,20 +67,125 @@ const US_STATES = [
   'MP',
 ];
 
-const CANADIAN_PROVINCES = [
-  'AB',
-  'BC',
-  'MB',
-  'NB',
-  'NL',
-  'NS',
-  'NT',
-  'NU',
-  'ON',
+const UK_COUNTIES = [
+  'AE',
+  'BD',
+  'BH',
+  'BN',
+  'BR',
+  'BS',
+  'BT',
+  'CA',
+  'CB',
+  'CF',
+  'CH',
+  'CM',
+  'CO',
+  'CR',
+  'CT',
+  'CV',
+  'CW',
+  'DA',
+  'DD',
+  'DE',
+  'DG',
+  'DH',
+  'DL',
+  'DN',
+  'DT',
+  'DY',
+  'EC',
+  'EH',
+  'EN',
+  'EX',
+  'FK',
+  'FY',
+  'GA',
+  'GL',
+  'GU',
+  'HA',
+  'HD',
+  'HG',
+  'HP',
+  'HR',
+  'HS',
+  'HU',
+  'HX',
+  'IG',
+  'IP',
+  'IV',
+  'KA',
+  'KT',
+  'KW',
+  'KY',
+  'L',
+  'LA',
+  'LD',
+  'LE',
+  'LI',
+  'LL',
+  'LN',
+  'LS',
+  'LU',
+  'M',
+  'MA',
+  'ME',
+  'MK',
+  'ML',
+  'N',
+  'NE',
+  'NG',
+  'NN',
+  'NP',
+  'NR',
+  'NW',
+  'OL',
+  'OX',
+  'PA',
   'PE',
-  'QC',
+  'PH',
+  'PL',
+  'PR',
+  'RG',
+  'RH',
+  'RM',
+  'S',
+  'SA',
+  'SE',
+  'SG',
   'SK',
-  'YT',
+  'SL',
+  'SM',
+  'SN',
+  'SO',
+  'SP',
+  'SR',
+  'SS',
+  'ST',
+  'SW',
+  'SY',
+  'TA',
+  'TD',
+  'TF',
+  'TN',
+  'TQ',
+  'TR',
+  'TS',
+  'TW',
+  'TY',
+  'UB',
+  'UP',
+  'W',
+  'WA',
+  'WC',
+  'WD',
+  'WF',
+  'WN',
+  'WR',
+  'WS',
+  'WV',
+  'YO',
+  'ZE',
 ];
 
 export interface AddressFormProps {
@@ -108,17 +213,17 @@ export function AddressForm({
   };
 
   const getStateOptions = () => {
-    if (value.country === 'CA' || value.country === 'CAN') {
-      return CANADIAN_PROVINCES;
+    if (value.country === 'GB') {
+      return UK_COUNTIES;
     }
     return US_STATES;
   };
 
-  const stateLabel = value.country === 'CA' || value.country === 'CAN' ? 'Province' : 'State';
+  const stateLabel = value.country === 'GB' ? 'County' : 'State';
 
   return (
-    <fieldset className="border border-gray-300 rounded-md p-4 mb-4">
-      <legend className="text-lg font-semibold mb-4">{title}</legend>
+    <fieldset className="border border-gray-300 rounded-md p-4 mb-4 bg-white">
+      <legend className="text-lg font-semibold mb-4 text-gray-900">{title}</legend>
 
       {showAllFields && (
         <FormField
@@ -133,7 +238,7 @@ export function AddressForm({
             value={value.name || ''}
             onChange={(e) => onChange({ ...value, name: e.target.value })}
             disabled={disabled}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-required="true"
             aria-invalid={!!getErrorForField('name')}
             aria-describedby={getErrorForField('name') ? `${title}-name-error` : undefined}
@@ -153,7 +258,7 @@ export function AddressForm({
           value={value.street1 || ''}
           onChange={(e) => onChange({ ...value, street1: e.target.value })}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-required="true"
           aria-invalid={!!getErrorForField('street1')}
           aria-describedby={getErrorForField('street1') ? `${title}-street1-error` : undefined}
@@ -167,7 +272,7 @@ export function AddressForm({
           value={value.street2 || ''}
           onChange={(e) => onChange({ ...value, street2: e.target.value })}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </FormField>
 
@@ -178,7 +283,7 @@ export function AddressForm({
           value={value.city || ''}
           onChange={(e) => onChange({ ...value, city: e.target.value })}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-required="true"
           aria-invalid={!!getErrorForField('city')}
           aria-describedby={getErrorForField('city') ? `${title}-city-error` : undefined}
@@ -197,10 +302,7 @@ export function AddressForm({
             value={value.state || ''}
             onChange={(e) => onChange({ ...value, state: e.target.value })}
             disabled={disabled}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-required="true"
-            aria-invalid={!!getErrorForField('state')}
-            aria-describedby={getErrorForField('state') ? `${title}-state-error` : undefined}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select {stateLabel}</option>
             {getStateOptions().map((state) => (
@@ -223,8 +325,7 @@ export function AddressForm({
             value={value.postalCode || ''}
             onChange={(e) => onChange({ ...value, postalCode: e.target.value })}
             disabled={disabled}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={value.country === 'CA' || value.country === 'CAN' ? 'A1A 1A1' : '12345'}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-required="true"
             aria-invalid={!!getErrorForField('postalCode')}
             aria-describedby={
@@ -245,13 +346,12 @@ export function AddressForm({
           value={value.country || 'US'}
           onChange={(e) => onChange({ ...value, country: e.target.value })}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-required="true"
           aria-invalid={!!getErrorForField('country')}
           aria-describedby={getErrorForField('country') ? `${title}-country-error` : undefined}
         >
           <option value="US">United States</option>
-          <option value="CA">Canada</option>
           <option value="GB">United Kingdom</option>
         </select>
       </FormField>
@@ -264,7 +364,7 @@ export function AddressForm({
             value={value.phone || ''}
             onChange={(e) => onChange({ ...value, phone: e.target.value })}
             disabled={disabled}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </FormField>
       )}

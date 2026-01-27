@@ -59,8 +59,8 @@ export function RatesFilters({
   return (
     <div className="bg-gray-100 rounded-lg p-4 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Carrier Filter */}
-        <div>
+        {/* Carrier Filter - COMMENTED OUT to show FedEx only */}
+        {/* <div>
           <label className="block text-sm font-semibold text-gray-900 mb-3">Carriers</label>
           <div className="space-y-2">
             {uniqueCarriers.map((carrier) => (
@@ -75,7 +75,7 @@ export function RatesFilters({
               </label>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Speed Filter */}
         <div>

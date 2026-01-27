@@ -160,25 +160,13 @@ export class PostalCodeFormatValidator extends BaseValidator<Address> {
       }
     }
 
-    // Canadian postal code: A1A 1A1 format
-    if (country === 'CA' || country === 'CAN') {
-      const canadianPostalRegex = /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i;
-      if (!canadianPostalRegex.test(postalCode)) {
-        errors.push({
-          field: 'postalCode',
-          message: 'Canadian postal code must be in A1A 1A1 format',
-          code: 'INVALID_CA_POSTAL_CODE',
-        });
-      }
-    }
-
-    // UK postal code: Basic format check
+    // UK postal code: Format like SW1A 1AA or B33 8TH
     if (country === 'GB' || country === 'UK') {
       const ukPostalRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
       if (!ukPostalRegex.test(postalCode)) {
         errors.push({
           field: 'postalCode',
-          message: 'UK postal code format is invalid',
+          message: 'UK postcode must be in format like SW1A 1AA',
           code: 'INVALID_UK_POSTAL_CODE',
         });
       }
@@ -254,20 +242,125 @@ export class StateCodeValidator extends BaseValidator<Address> {
     'MP',
   ]);
 
-  private readonly canadianProvinces = new Set([
-    'AB',
-    'BC',
-    'MB',
-    'NB',
-    'NL',
-    'NS',
-    'NT',
-    'NU',
-    'ON',
+  private readonly ukCounties = new Set([
+    'AE',
+    'BD',
+    'BH',
+    'BN',
+    'BR',
+    'BS',
+    'BT',
+    'CA',
+    'CB',
+    'CF',
+    'CH',
+    'CM',
+    'CO',
+    'CR',
+    'CT',
+    'CV',
+    'CW',
+    'DA',
+    'DD',
+    'DE',
+    'DG',
+    'DH',
+    'DL',
+    'DN',
+    'DT',
+    'DY',
+    'EC',
+    'EH',
+    'EN',
+    'EX',
+    'FK',
+    'FY',
+    'GA',
+    'GL',
+    'GU',
+    'HA',
+    'HD',
+    'HG',
+    'HP',
+    'HR',
+    'HS',
+    'HU',
+    'HX',
+    'IG',
+    'IP',
+    'IV',
+    'KA',
+    'KT',
+    'KW',
+    'KY',
+    'L',
+    'LA',
+    'LD',
+    'LE',
+    'LI',
+    'LL',
+    'LN',
+    'LS',
+    'LU',
+    'M',
+    'MA',
+    'ME',
+    'MK',
+    'ML',
+    'N',
+    'NE',
+    'NG',
+    'NN',
+    'NP',
+    'NR',
+    'NW',
+    'OL',
+    'OX',
+    'PA',
     'PE',
-    'QC',
+    'PH',
+    'PL',
+    'PR',
+    'RG',
+    'RH',
+    'RM',
+    'S',
+    'SA',
+    'SE',
+    'SG',
     'SK',
-    'YT',
+    'SL',
+    'SM',
+    'SN',
+    'SO',
+    'SP',
+    'SR',
+    'SS',
+    'ST',
+    'SW',
+    'SY',
+    'TA',
+    'TD',
+    'TF',
+    'TN',
+    'TQ',
+    'TR',
+    'TS',
+    'TW',
+    'TY',
+    'UB',
+    'UP',
+    'W',
+    'WA',
+    'WC',
+    'WD',
+    'WF',
+    'WN',
+    'WR',
+    'WS',
+    'WV',
+    'YO',
+    'ZE',
   ]);
 
   protected doValidation(data: Address): ValidationResult {
@@ -283,12 +376,12 @@ export class StateCodeValidator extends BaseValidator<Address> {
           code: 'INVALID_US_STATE',
         });
       }
-    } else if (country === 'CA' || country === 'CAN') {
-      if (!this.canadianProvinces.has(state)) {
+    } else if (country === 'GB') {
+      if (!this.ukCounties.has(state)) {
         errors.push({
           field: 'state',
-          message: 'Invalid Canadian province code',
-          code: 'INVALID_CA_PROVINCE',
+          message: 'Invalid UK county code',
+          code: 'INVALID_UK_COUNTY',
         });
       }
     }

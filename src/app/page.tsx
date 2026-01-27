@@ -13,16 +13,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Shipping Rate Calculator</h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-700">
             Get competitive rates from multiple carriers in seconds
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-300">
           <RateCalculatorForm onSuccess={handleSuccess} />
         </div>
       </div>

@@ -11,13 +11,14 @@ import type { RateResponse, CarrierName, ServiceSpeed } from '@/types/domain';
 
 interface RatesDisplayProps {
   ratesPromise: Promise<RateResponse>;
+  selectedSpeed?: ServiceSpeed;
 }
 
 /**
  * Main display component that uses React 19's use() hook
  * Consumes the promise and conditionally renders results
  */
-export function RatesDisplay({ ratesPromise }: RatesDisplayProps) {
+export function RatesDisplay({ ratesPromise, selectedSpeed }: RatesDisplayProps) {
   const rawData = use(ratesPromise);
 
   // Convert ISO string dates back to Date objects
@@ -34,7 +35,9 @@ export function RatesDisplay({ ratesPromise }: RatesDisplayProps) {
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCarriers, setSelectedCarriers] = useState<CarrierName[]>([]);
-  const [selectedSpeeds, setSelectedSpeeds] = useState<ServiceSpeed[]>([]);
+  const [selectedSpeeds, setSelectedSpeeds] = useState<ServiceSpeed[]>(
+    selectedSpeed ? [selectedSpeed] : []
+  );
   const [sortBy, setSortBy] = useState<'price' | 'speed' | 'carrier'>('price');
 
   // Detect mobile viewport

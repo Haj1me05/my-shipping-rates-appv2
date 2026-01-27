@@ -6,7 +6,15 @@ import type { RateRequest, RateResponse } from '@/types/domain';
  */
 export async function fetchRates(request: RateRequest): Promise<RateResponse> {
   try {
-    const response = await fetch('/api/rates', {
+    // Get the base URL from environment or construct from window location
+    const baseUrl =
+      typeof window !== 'undefined'
+        ? `${window.location.protocol}//${window.location.host}`
+        : process.env.NEXT_PUBLIC_API_URL || '';
+
+    const apiUrl = `${baseUrl}/api/rates`;
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

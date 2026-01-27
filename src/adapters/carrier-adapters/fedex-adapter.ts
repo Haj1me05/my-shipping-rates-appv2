@@ -22,9 +22,31 @@ const FEDEX_SPEED_MAP: Record<string, ServiceSpeed> = {
   GROUND_HOME_DELIVERY: 'economy',
 };
 
+/**
+ * Check if a postal code is a UK postcode (not a US ZIP)
+ */
+function isUKPostcode(postalCode: string): boolean {
+  // UK postcodes have letters, US ZIPs are only digits
+  // UK format: SW1A 1AA or B33 8TH (alphanumeric with optional space)
+  const ukPostcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
+  return ukPostcodeRegex.test(postalCode);
+}
+
 export class FedExAdapter implements CarrierAdapter {
   async fetchRates(request: RateRequest): Promise<ShippingRate[]> {
     try {
+      // Check for invalid international combinations (UK postcodes not supported via API)
+      if (isUKPostcode(request.destinationZipCode)) {
+        console.warn(
+          '[FedEx] UK postcode detected (' +
+            request.destinationZipCode +
+            '). FedEx API does not support UK domestic shipments. Returning mock rates.'
+        );
+        return this.getMockRates().then((response) =>
+          response.output.rateReplyDetails.map((detail) => this.adaptFedExRate(detail))
+        );
+      }
+
       const response = await this.callFedExAPI(request);
       if (response.output.alerts) {
         this.handleAlerts(response.output.alerts);

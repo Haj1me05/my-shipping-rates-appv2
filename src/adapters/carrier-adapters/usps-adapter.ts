@@ -31,6 +31,8 @@ export class USPSAdapter implements CarrierAdapter {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Mock response for demonstration
+    // COMMENTED OUT - USPS rates disabled to test FedEx only
+    /*
     return {
       RateV4Response: {
         Package: {
@@ -48,6 +50,16 @@ export class USPSAdapter implements CarrierAdapter {
               Rate: '12.50',
             },
           ],
+        },
+      },
+    };
+    */
+
+    // Return empty response since USPS is disabled
+    return {
+      RateV4Response: {
+        Package: {
+          Postage: [],
         },
       },
     };

@@ -32,7 +32,7 @@ export function FormField({
 
   return (
     <div className="mb-4">
-      <label htmlFor={htmlFor} className="block mb-2 font-medium text-gray-700">
+      <label htmlFor={htmlFor} className="block mb-2 font-medium text-gray-900">
         {label}
         {required && (
           <span className="text-red-600 ml-1" aria-label="required">

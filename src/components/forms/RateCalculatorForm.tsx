@@ -104,12 +104,12 @@ export function RateCalculatorForm({ onSuccess, onCancel }: RateCalculatorFormPr
     <div className="max-w-2xl mx-auto p-6">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Calculate Shipping Rates</h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-700 mt-2">
           Get accurate shipping rates from multiple carriers in just a few steps.
         </p>
       </header>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
         {/* Step Content */}
         <div className="mb-8" role="region" aria-label={`Step ${form.state.currentStep} of 4`}>
           {form.state.currentStep === 1 && (
@@ -125,7 +125,7 @@ export function RateCalculatorForm({ onSuccess, onCancel }: RateCalculatorFormPr
 
           {form.state.currentStep === 2 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Addresses</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Addresses</h2>
               <AddressStep
                 originAddress={form.state.originAddress}
                 destinationAddress={form.state.destinationAddress}
@@ -138,7 +138,7 @@ export function RateCalculatorForm({ onSuccess, onCancel }: RateCalculatorFormPr
 
           {form.state.currentStep === 3 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Shipping Options</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Shipping Options</h2>
               <ShippingOptionsStep
                 options={form.state.shippingOptions}
                 onChange={form.updateShippingOptions}
@@ -148,7 +148,7 @@ export function RateCalculatorForm({ onSuccess, onCancel }: RateCalculatorFormPr
 
           {form.state.currentStep === 4 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Review & Calculate</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Review & Calculate</h2>
               <ReviewStep
                 package={form.state.package}
                 originAddress={form.state.originAddress}

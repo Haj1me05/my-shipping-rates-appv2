@@ -30,6 +30,9 @@ export class UPSAdapter implements CarrierAdapter {
     // Simulate API call with mock data
     await new Promise((resolve) => setTimeout(resolve, 120));
 
+    // Mock response for demonstration
+    // COMMENTED OUT - UPS rates disabled to test FedEx only
+    /*
     return {
       RateModels: [
         {
@@ -65,6 +68,12 @@ export class UPSAdapter implements CarrierAdapter {
           },
         },
       ],
+    };
+    */
+
+    // Return empty response since UPS is disabled
+    return {
+      RateModels: [],
     };
   }
 

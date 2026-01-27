@@ -23,6 +23,33 @@ interface RateServiceRequest {
 }
 
 /**
+ * Validates address combination for shipping feasibility
+ */
+function validateAddressCombination(request: RateServiceRequest): string[] {
+  const errors: string[] = [];
+
+  // Check for UK postcode (only alphanumeric)
+  const isUKPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(request.destinationZipCode);
+  const isUSZip = /^\d{5}(-\d{4})?$/.test(request.destinationZipCode);
+  const isOriginUSZip = /^\d{5}(-\d{4})?$/.test(request.originZipCode);
+
+  // Check for mismatched origin/destination combinations
+  if (isOriginUSZip && isUKPostcode) {
+    errors.push(
+      'International shipments from US to UK require special handling and may have limited carrier options.'
+    );
+  }
+
+  if (!isOriginUSZip && !isUSZip) {
+    errors.push(
+      'Current system supports US domestic shipments only. International routes may not be available.'
+    );
+  }
+
+  return errors;
+}
+
+/**
  * RateService - Orchestrates parallel rate fetching from multiple carriers
  * with error handling and fee application using decorator pattern
  */
@@ -36,6 +63,12 @@ export class RateService {
   ): Promise<RateResponse> {
     const requestId = this.generateRequestId();
     const configManager = CarrierConfigManager.getInstance();
+
+    // Validate address combination
+    const validationWarnings = validateAddressCombination(request);
+    if (validationWarnings.length > 0) {
+      console.warn('[RateService] Address validation warnings:', validationWarnings);
+    }
 
     // Use provided carriers or fall back to configured carriers
     let carriers = request.carriers || (['USPS', 'FedEx', 'UPS'] as CarrierName[]);
@@ -78,6 +111,15 @@ export class RateService {
         }
       }
     });
+
+    // Add validation warnings as errors if applicable
+    if (validationWarnings.length > 0 && rates.length === 0) {
+      errors.push({
+        carrier: 'System' as any,
+        message: validationWarnings.join('; '),
+        recoverable: true,
+      });
+    }
 
     // Sort rates by cost, then by delivery date
     const sortedRates = this.sortRates(rates);
