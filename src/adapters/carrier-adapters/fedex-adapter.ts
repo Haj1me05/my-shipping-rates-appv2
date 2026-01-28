@@ -112,22 +112,24 @@ export class FedExAdapter implements CarrierAdapter {
         '[FedEx] Using demo credentials. Set FEDEX_API_KEY and FEDEX_API_SECRET in .env for real rates.'
       );
       // Fall back to mock data for demo purposes
-      return this.getMockRates();
+      // Detect countries from postal codes for proper mock data
+      const originCountry = detectCountryFromPostalCode(request.originZipCode.trim());
+      const destinationCountry = detectCountryFromPostalCode(request.destinationZipCode.trim());
+      return this.getMockRates(originCountry, destinationCountry);
     }
+
+    // Trim postal codes and detect country codes (before try block so they're accessible in catch)
+    const originZipCode = request.originZipCode.trim();
+    const destinationZipCode = request.destinationZipCode.trim();
+    const originCountry = detectCountryFromPostalCode(originZipCode);
+    const destinationCountry = detectCountryFromPostalCode(destinationZipCode);
+
+    // Determine if this is an intra-country (non-US domestic) shipment
+    const isIntraCountryNonUS = originCountry !== 'US' && originCountry === destinationCountry;
 
     try {
       // Get authentication token first
       const token = await this.getAuthToken(credentials);
-
-      // Trim postal codes and detect country codes
-      const originZipCode = request.originZipCode.trim();
-      const destinationZipCode = request.destinationZipCode.trim();
-
-      const originCountry = detectCountryFromPostalCode(originZipCode);
-      const destinationCountry = detectCountryFromPostalCode(destinationZipCode);
-
-      // Determine if this is an intra-country (non-US domestic) shipment
-      const isIntraCountryNonUS = originCountry !== 'US' && originCountry === destinationCountry;
 
       // Build FedEx Rate Quote API request payload
       const payload: any = {
@@ -159,35 +161,30 @@ export class FedExAdapter implements CarrierAdapter {
               countryCode: destinationCountry,
             },
           },
-          // All routes use DROPOFF_AT_FEDEX_LOCATION
+          // Use DROPOFF_AT_FEDEX_LOCATION for all routes (including GB domestic)
           pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
           shipDateStamp: new Date().toISOString().split('T')[0],
-          // Note: Don't specify serviceType - let FedEx return all available services
-          // for the route. FedEx will reject invalid service types like INTERNATIONAL_PRIORITY
-          // for domestic shipments. Omitting serviceType allows FedEx to determine valid options.
+          // Don't specify serviceType - let FedEx return all available services for the route
+          // This allows the API to determine valid service options based on origin/destination
+          // Use YOUR_PACKAGING for all routes - FEDEX_BOX causes SERVICE.PACKAGECOMBINATION.INVALID errors
           packagingType: 'YOUR_PACKAGING',
           rateRequestType: ['ACCOUNT', 'LIST'],
           requestedPackageLineItems: [
             {
               weight: {
-                // Use KG for intra-country, LB for others
-                units: isIntraCountryNonUS ? 'KG' : 'LB',
-                value: isIntraCountryNonUS
-                  ? this.convertLbsToKg(request.weight)
-                  : this.convertToLbs(request.weight),
+                // Use LB for all routes (consistent with IN dimensions)
+                units: 'LB',
+                value: this.convertToLbs(request.weight),
               },
-              // NOTE: Dimensions are NOT supported for intra-country shipments (GB→GB, etc.)
-              // Only include dimensions for US domestic (US→US) and international routes
-              // Exclude for other intra-country combinations
-              ...(request.dimensions &&
-                !isIntraCountryNonUS && {
-                  dimensions: {
-                    length: Math.ceil(request.dimensions.length),
-                    width: Math.ceil(request.dimensions.width),
-                    height: Math.ceil(request.dimensions.height),
-                    units: 'IN',
-                  },
-                }),
+              // Include dimensions for all routes (in inches)
+              ...(request.dimensions && {
+                dimensions: {
+                  length: Math.ceil(request.dimensions.length),
+                  width: Math.ceil(request.dimensions.width),
+                  height: Math.ceil(request.dimensions.height),
+                  units: 'IN',
+                },
+              }),
               groupPackageCount: 1,
             },
           ],
@@ -208,12 +205,7 @@ export class FedExAdapter implements CarrierAdapter {
       console.log(
         '[FedEx] Service Type: NOT SPECIFIED - FedEx will return all applicable services'
       );
-      console.log(
-        '[FedEx] Weight:',
-        isIntraCountryNonUS
-          ? `${this.convertLbsToKg(request.weight)} kg (intra-country uses KG)`
-          : `${this.convertToLbs(request.weight)} lbs`
-      );
+      console.log('[FedEx] Weight:', `${this.convertToLbs(request.weight)} lbs`);
       console.log('[FedEx] ==============================');
       console.log('[FedEx] Payload:', JSON.stringify(payload, null, 2));
 
@@ -241,7 +233,7 @@ export class FedExAdapter implements CarrierAdapter {
       console.error('[FedEx] API call failed:', message);
       // Fall back to mock rates on error
       console.log('[FedEx] Falling back to mock rates due to error');
-      return this.getMockRates();
+      return this.getMockRates(originCountry, destinationCountry);
     }
   }
 
@@ -298,9 +290,9 @@ export class FedExAdapter implements CarrierAdapter {
 
   private getCurrencyForCountry(countryCode: string): string {
     // Map country codes to currency codes for customs value
-    // NOTE: GB uses EUR for intra-country shipments (FedEx treats intra-Europe with EUR)
+    // NOTE: GB uses GBP
     const currencyMap: Record<string, string> = {
-      GB: 'EUR',
+      GB: 'GBP',
       US: 'USD',
       CA: 'CAD',
       FR: 'EUR',
@@ -322,8 +314,108 @@ export class FedExAdapter implements CarrierAdapter {
     return currencyMap[countryCode] || 'USD';
   }
 
-  private getMockRates(): FedExRateResponse {
-    // Mock data for demonstration/fallback - supports all routes
+  private getMockRates(originCountry?: string, destinationCountry?: string): FedExRateResponse {
+    // Check if this is a UK domestic (GB→GB) shipment
+    const isUKDomestic = originCountry === 'GB' && destinationCountry === 'GB';
+
+    if (isUKDomestic) {
+      // UK domestic mock rates with realistic UK services and GBP pricing
+      return {
+        output: {
+          rateReplyDetails: [
+            {
+              serviceType: 'FEDEX_UK_PRIORITY',
+              serviceName: 'FedEx UK Priority',
+              serviceDescription: { code: 'UK1' },
+              ratedShipmentDetails: [
+                {
+                  rateType: 'ACCOUNT',
+                  totalBaseCharge: 12.99,
+                  totalNetCharge: 15.49,
+                  currency: 'GBP',
+                  shipmentRateDetail: {
+                    surCharges: [
+                      {
+                        type: 'FUEL',
+                        description: 'Fuel Surcharge',
+                        amount: 2.5,
+                      },
+                    ],
+                  },
+                },
+              ],
+              operationalDetail: {
+                transitTime: 'ONE_DAY',
+                ineligibleForMoneyBackGuarantee: false,
+              },
+              commit: {
+                dateDetail: { dayCxsFormat: '2026-01-28T18:00:00' },
+              },
+            },
+            {
+              serviceType: 'FEDEX_UK_STANDARD',
+              serviceName: 'FedEx UK Standard',
+              serviceDescription: { code: 'UK2' },
+              ratedShipmentDetails: [
+                {
+                  rateType: 'ACCOUNT',
+                  totalBaseCharge: 8.99,
+                  totalNetCharge: 10.79,
+                  currency: 'GBP',
+                  shipmentRateDetail: {
+                    surCharges: [
+                      {
+                        type: 'FUEL',
+                        description: 'Fuel Surcharge',
+                        amount: 1.8,
+                      },
+                    ],
+                  },
+                },
+              ],
+              operationalDetail: {
+                transitTime: 'TWO_DAYS',
+                ineligibleForMoneyBackGuarantee: false,
+              },
+              commit: {
+                dateDetail: { dayCxsFormat: '2026-01-29T23:59:00' },
+              },
+            },
+            {
+              serviceType: 'FEDEX_UK_ECONOMY',
+              serviceName: 'FedEx UK Economy',
+              serviceDescription: { code: 'UK3' },
+              ratedShipmentDetails: [
+                {
+                  rateType: 'ACCOUNT',
+                  totalBaseCharge: 5.99,
+                  totalNetCharge: 7.19,
+                  currency: 'GBP',
+                  shipmentRateDetail: {
+                    surCharges: [
+                      {
+                        type: 'FUEL',
+                        description: 'Fuel Surcharge',
+                        amount: 1.2,
+                      },
+                    ],
+                  },
+                },
+              ],
+              operationalDetail: {
+                transitTime: 'THREE_DAYS',
+                ineligibleForMoneyBackGuarantee: true,
+              },
+              commit: {
+                dateDetail: { dayCxsFormat: '2026-01-30T23:59:00' },
+              },
+            },
+          ],
+        },
+      };
+    }
+
+    // Default mock data for US and international routes
     return {
       output: {
         rateReplyDetails: [

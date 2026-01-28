@@ -77,6 +77,7 @@ export interface FedExRatedShipment {
   rateType: string;
   totalBaseCharge: number;
   totalNetCharge: number;
+  currency?: string;
   shipmentRateDetail?: {
     surCharges?: FedExSurcharge[];
   };

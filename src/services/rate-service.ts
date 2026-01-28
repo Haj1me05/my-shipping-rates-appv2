@@ -44,9 +44,13 @@ function validateAddressCombination(request: RateServiceRequest): string[] {
     );
   }
 
-  if (!isOriginUSZip && !isUSZip) {
+  // Check if both origin and destination are non-US (but same country) - allow GB→GB
+  const isOriginUKPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(originZipCode);
+  const isSameCountryNonUS = isOriginUKPostcode && isUKPostcode;
+
+  if (!isOriginUSZip && !isUSZip && !isSameCountryNonUS) {
     errors.push(
-      'Current system supports US domestic shipments only. International routes may not be available.'
+      'Shipments between non-US countries require special handling and may have limited carrier options.'
     );
   }
 
