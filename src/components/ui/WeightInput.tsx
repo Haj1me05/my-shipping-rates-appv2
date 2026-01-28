@@ -95,12 +95,14 @@ export function WeightInput({
       {showDimensionalWeight && (
         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm">
           <p className="font-medium text-blue-900">Weight Calculation</p>
-          <p className="text-blue-800">Actual: {showDimensionalWeight.actual.toFixed(2)} lbs</p>
           <p className="text-blue-800">
-            Dimensional: {showDimensionalWeight.dimensional.toFixed(2)} lbs
+            Actual: {showDimensionalWeight.actual.toFixed(2)} {unit}
+          </p>
+          <p className="text-blue-800">
+            Dimensional: {showDimensionalWeight.dimensional.toFixed(2)} {unit}
           </p>
           <p className="font-medium text-blue-900 mt-1">
-            Billable: {showDimensionalWeight.billable.toFixed(2)} lbs
+            Billable: {showDimensionalWeight.billable.toFixed(2)} {unit}
             {showDimensionalWeight.isDimensionalApplied && (
               <span className="text-blue-600 ml-2">(dimensional weight applied)</span>
             )}

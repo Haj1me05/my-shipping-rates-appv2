@@ -14,6 +14,7 @@ export interface UseDimensionalWeightReturn {
   billableWeight: number;
   isDimensionalWeightApplied: boolean;
   weightInPounds: number;
+  weightUnit: 'lbs' | 'kg';
 }
 
 /**
@@ -44,12 +45,19 @@ export function useDimensionalWeight(
     const billableWeight = Math.max(actualWeightInPounds, dimensionalWeightInPounds);
     const isDimensionalWeightApplied = dimensionalWeightInPounds > actualWeightInPounds;
 
+    // Convert weights to the selected unit for display
+    const conversionFactor = weight.unit === 'kg' ? 0.453592 : 1;
+    const displayActualWeight = actualWeightInPounds * conversionFactor;
+    const displayDimensionalWeight = dimensionalWeightInPounds * conversionFactor;
+    const displayBillableWeight = billableWeight * conversionFactor;
+
     return {
-      actualWeight: actualWeightInPounds,
-      dimensionalWeight: dimensionalWeightInPounds,
-      billableWeight,
+      actualWeight: displayActualWeight,
+      dimensionalWeight: displayDimensionalWeight,
+      billableWeight: displayBillableWeight,
       isDimensionalWeightApplied,
       weightInPounds: actualWeightInPounds,
+      weightUnit: weight.unit,
     };
   }, [dimensions, weight]);
 
