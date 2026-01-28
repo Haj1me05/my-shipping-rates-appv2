@@ -89,7 +89,7 @@ export interface ShippingOptions {
 /**
  * Union type for supported carriers
  */
-export type CarrierName = 'USPS' | 'FedEx' | 'UPS' | 'DHL';
+export type CarrierName = 'USPS' | 'FedEx' | 'UPS';
 
 /**
  * Union type for fee categories
@@ -118,7 +118,7 @@ export interface ShippingRate {
   baseRate: number;
   additionalFees: Fee[];
   totalCost: number;
-  estimatedDeliveryDate: Date;
+  estimatedDeliveryDate: Date | string;
   guaranteedDelivery: boolean;
 }
 

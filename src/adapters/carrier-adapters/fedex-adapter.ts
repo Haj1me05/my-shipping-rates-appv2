@@ -124,9 +124,6 @@ export class FedExAdapter implements CarrierAdapter {
     const originCountry = detectCountryFromPostalCode(originZipCode);
     const destinationCountry = detectCountryFromPostalCode(destinationZipCode);
 
-    // Determine if this is an intra-country (non-US domestic) shipment
-    const isIntraCountryNonUS = originCountry !== 'US' && originCountry === destinationCountry;
-
     try {
       // Get authentication token first
       const token = await this.getAuthToken(credentials);
@@ -281,37 +278,6 @@ export class FedExAdapter implements CarrierAdapter {
     // Assuming input weight is in the unit from request
     // For now, assume it's already in lbs, but you may need to adjust based on actual request units
     return Math.round(weight * 100) / 100;
-  }
-
-  private convertLbsToKg(weight: number): number {
-    // Convert pounds to kilograms (1 lb = 0.453592 kg)
-    return Math.round(weight * 0.453592 * 100) / 100;
-  }
-
-  private getCurrencyForCountry(countryCode: string): string {
-    // Map country codes to currency codes for customs value
-    // NOTE: GB uses GBP
-    const currencyMap: Record<string, string> = {
-      GB: 'GBP',
-      US: 'USD',
-      CA: 'CAD',
-      FR: 'EUR',
-      DE: 'EUR',
-      IT: 'EUR',
-      ES: 'EUR',
-      NL: 'EUR',
-      BE: 'EUR',
-      AT: 'EUR',
-      SE: 'SEK',
-      NO: 'NOK',
-      CH: 'CHF',
-      AU: 'AUD',
-      JP: 'JPY',
-      CN: 'CNY',
-      IN: 'INR',
-      MX: 'MXN',
-    };
-    return currencyMap[countryCode] || 'USD';
   }
 
   private getMockRates(originCountry?: string, destinationCountry?: string): FedExRateResponse {

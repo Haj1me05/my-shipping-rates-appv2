@@ -1,14 +1,12 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import type { ShippingRate, CarrierName, ServiceSpeed } from '@/types/domain';
+import type { ShippingRate, ServiceSpeed } from '@/types/domain';
 
 interface RatesFiltersProps {
   rates: ShippingRate[];
-  onCarrierToggle: (carrier: CarrierName) => void;
   onSpeedToggle: (speed: ServiceSpeed) => void;
   onSortChange: (field: 'price' | 'speed' | 'carrier') => void;
-  selectedCarriers: CarrierName[];
   selectedSpeeds: ServiceSpeed[];
   sortBy: 'price' | 'speed' | 'carrier';
 }
@@ -18,29 +16,15 @@ interface RatesFiltersProps {
  */
 export function RatesFilters({
   rates,
-  onCarrierToggle,
   onSpeedToggle,
   onSortChange,
-  selectedCarriers,
   selectedSpeeds,
   sortBy,
 }: RatesFiltersProps) {
-  // Get unique carriers from rates
-  const uniqueCarriers = useMemo(() => {
-    return Array.from(new Set(rates.map((r) => r.carrier as CarrierName)));
-  }, [rates]);
-
   // Get unique speeds from rates
   const uniqueSpeeds = useMemo(() => {
     return Array.from(new Set(rates.map((r) => r.speed as ServiceSpeed)));
   }, [rates]);
-
-  const handleCarrierChange = useCallback(
-    (carrier: CarrierName) => {
-      onCarrierToggle(carrier);
-    },
-    [onCarrierToggle]
-  );
 
   const handleSpeedChange = useCallback(
     (speed: ServiceSpeed) => {

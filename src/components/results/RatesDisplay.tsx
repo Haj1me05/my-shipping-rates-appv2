@@ -1,17 +1,16 @@
 'use client';
 
-import { use, useState, useMemo, useCallback } from 'react';
+import { use, useState, useMemo, useCallback, useEffect } from 'react';
 import { RatesComparisonTable } from './RatesComparisonTable';
 import { RateCard } from './RateCard';
 import { RatesFilters } from './RatesFilters';
 import { RatesErrorDisplay } from './RatesErrorDisplay';
 import { NoRatesFound } from './NoRatesFound';
-import { saveResults } from '@/lib/results-storage';
-import type { RateResponse, CarrierName, ServiceSpeed } from '@/types/domain';
+import type { RateResponse, ServiceSpeed } from '@/types/domain';
 
 interface RatesDisplayProps {
-  ratesPromise: Promise<RateResponse>;
-  selectedSpeed?: ServiceSpeed;
+  readonly ratesPromise: Promise<RateResponse>;
+  readonly selectedSpeed?: ServiceSpeed;
 }
 
 /**
@@ -22,47 +21,43 @@ export function RatesDisplay({ ratesPromise, selectedSpeed }: RatesDisplayProps)
   const rawData = use(ratesPromise);
 
   // Convert ISO string dates back to Date objects
-  const data = {
-    ...rawData,
-    rates: rawData.rates.map((rate) => ({
-      ...rate,
-      estimatedDeliveryDate:
-        typeof rate.estimatedDeliveryDate === 'string'
-          ? new Date(rate.estimatedDeliveryDate)
-          : rate.estimatedDeliveryDate,
-    })),
-  };
+  const data = useMemo(
+    () => ({
+      ...rawData,
+      rates: rawData.rates.map((rate) => ({
+        ...rate,
+        estimatedDeliveryDate:
+          typeof rate.estimatedDeliveryDate === 'string'
+            ? new Date(rate.estimatedDeliveryDate)
+            : rate.estimatedDeliveryDate,
+      })),
+    }),
+    [rawData]
+  );
 
   const [isMobile, setIsMobile] = useState(false);
-  const [selectedCarriers, setSelectedCarriers] = useState<CarrierName[]>([]);
   const [selectedSpeeds, setSelectedSpeeds] = useState<ServiceSpeed[]>(
     selectedSpeed ? [selectedSpeed] : []
   );
   const [sortBy, setSortBy] = useState<'price' | 'speed' | 'carrier'>('price');
 
   // Detect mobile viewport
-  useMemo(() => {
-    if (typeof window !== 'undefined') {
-      const handleResize = () => setIsMobile(window.innerWidth < 768);
+  useEffect(() => {
+    if (globalThis.window) {
+      const handleResize = () => setIsMobile(globalThis.window.innerWidth < 768);
       handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      globalThis.window.addEventListener('resize', handleResize);
+      return () => globalThis.window.removeEventListener('resize', handleResize);
     }
   }, []);
 
   // Save results to localStorage after successful fetch
   useMemo(() => {
     if (data.rates.length > 0) {
-      saveResults(data.rates[0].id as any, data);
+      // Results are automatically saved via API response
+      // The original request is stored in ResultsContent cache
     }
   }, [data]);
-
-  // Handle carrier filter change
-  const handleCarrierToggle = useCallback((carrier: CarrierName) => {
-    setSelectedCarriers((prev) =>
-      prev.includes(carrier) ? prev.filter((c) => c !== carrier) : [...prev, carrier]
-    );
-  }, []);
 
   // Handle speed filter change
   const handleSpeedToggle = useCallback((speed: ServiceSpeed) => {
@@ -91,11 +86,11 @@ export function RatesDisplay({ ratesPromise, selectedSpeed }: RatesDisplayProps)
     );
   }
 
+  // Generate plural suffix for rates
+  const rateLabel = data.rates.length === 1 ? 'rate' : 'rates';
+
   // Results summary
-  const summaryText =
-    selectedCarriers.length > 0
-      ? `Showing ${data.rates.length} rate${data.rates.length !== 1 ? 's' : ''} from ${selectedCarriers.join(', ')}`
-      : `Showing ${data.rates.length} rate${data.rates.length !== 1 ? 's' : ''} from all carriers`;
+  const summaryText = `Showing ${data.rates.length} ${rateLabel} from all carriers`;
 
   return (
     <div className="space-y-6">
@@ -113,10 +108,8 @@ export function RatesDisplay({ ratesPromise, selectedSpeed }: RatesDisplayProps)
       {/* Filters and sorting */}
       <RatesFilters
         rates={data.rates}
-        onCarrierToggle={handleCarrierToggle}
         onSpeedToggle={handleSpeedToggle}
         onSortChange={handleSortChange}
-        selectedCarriers={selectedCarriers}
         selectedSpeeds={selectedSpeeds}
         sortBy={sortBy}
       />
@@ -126,7 +119,6 @@ export function RatesDisplay({ ratesPromise, selectedSpeed }: RatesDisplayProps)
         <div className="hidden md:block">
           <RatesComparisonTable
             rates={data.rates}
-            selectedCarriers={selectedCarriers}
             selectedSpeeds={selectedSpeeds}
             sortBy={sortBy}
           />

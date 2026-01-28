@@ -33,6 +33,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RateRespo
               recoverable: false,
             },
           ],
+          timestamp: new Date().toISOString(),
         },
         { status: 400 }
       );
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RateRespo
               recoverable: false,
             },
           ],
+          timestamp: new Date().toISOString(),
         },
         { status: 503 }
       );
@@ -125,6 +127,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RateRespo
             recoverable: false,
           },
         ],
+        timestamp: new Date().toISOString(),
       },
       { status: 500 }
     );
